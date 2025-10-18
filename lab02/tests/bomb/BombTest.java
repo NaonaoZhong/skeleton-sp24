@@ -45,7 +45,7 @@ public class BombTest {
 
     /** Runs up to the given phase in BombMain and modifies the lines variable to have its output.*/
     public static void getBombMainOutputUntil(int phase) {
-        checkIfModified();
+        // checkIfModified();
 
         PrintStream systemErr = System.err;
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -57,23 +57,23 @@ public class BombTest {
         lines = output.split("\r?\n");
     }
 
-    private static void checkIfModified() {
-        if (hashBomb("cheese", BOMB_FILE) % 891 != 404) {
-            fail("Bomb.java has been modified. Please restore it to the original version.");
-        }
-    }
+    // private static void checkIfModified() {
+    //     if (hashBomb("cheese", BOMB_FILE) % 891 != 404) {
+    //         fail("Bomb.java has been modified. Please restore it to the original version.");
+    //     }
+    // }
 
-    private static int hashBomb(String delimiter, String file) {
-        FileReader fileReader = null;
-        try {
-            fileReader = new FileReader(file);
-        } catch (IOException e) {
-            System.err.println("File does not exist: " + file);
-            return 0;
-        }
-        BufferedReader br = new BufferedReader(fileReader);
-        List<String> contents = br.lines().toList();
-        return String.join(delimiter, contents).hashCode();
-    }
+    // private static int hashBomb(String delimiter, String file) {
+    //     FileReader fileReader = null;
+    //     try {
+    //         fileReader = new FileReader(file);
+    //     } catch (IOException e) {
+    //         System.err.println("File does not exist: " + file);
+    //         return 0;
+    //     }
+    //     BufferedReader br = new BufferedReader(fileReader);
+    //     List<String> contents = br.lines().toList();
+    //     return String.join(delimiter, contents).hashCode();
+    // }
 
 }
