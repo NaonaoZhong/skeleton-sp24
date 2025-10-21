@@ -131,4 +131,112 @@ public class LinkedListDeque61BTest {
         assertThat(lld1.size()).isEqualTo(0);
     
     }
+// below is generated bt GPT-5-mini
+    @Test
+    @DisplayName("Adding null should throw IllegalArgumentException")
+    public void addNullThrowsTest() {
+        Deque61B<String> lld = new LinkedListDeque61B<>();
+        boolean threw = false;
+        try {
+            lld.addFirst(null);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        assertThat(threw).isEqualTo(true);
+
+        threw = false;
+        try {
+            lld.addLast(null);
+        } catch (IllegalArgumentException e) {
+            threw = true;
+        }
+        assertThat(threw).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("removeFirst/removeLast on empty deque returns null and size stays 0")
+    public void removeOnEmptyTest() {
+        Deque61B<Integer> lld = new LinkedListDeque61B<>();
+        assertThat(lld.size()).isEqualTo(0);
+        assertThat(lld.removeFirst()).isEqualTo(null);
+        assertThat(lld.removeLast()).isEqualTo(null);
+        // still zero
+        assertThat(lld.size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("get and getRecursive out-of-bounds behavior")
+    public void getOutOfBoundsTest() {
+        Deque61B<Integer> lld = new LinkedListDeque61B<>();
+        lld.addLast(1);
+        lld.addLast(2);
+        lld.addLast(3);
+
+        boolean threw = false;
+        try {
+            lld.get(-1);
+        } catch (IndexOutOfBoundsException e) {
+            threw = true;
+        }
+        assertThat(threw).isEqualTo(true);
+
+        threw = false;
+        try {
+            lld.get(3);
+        } catch (IndexOutOfBoundsException e) {
+            threw = true;
+        }
+        assertThat(threw).isEqualTo(true);
+
+        // getRecursive should also fail for out of bounds; since implementation uses recursion
+        // it may throw as well - check the same contract
+        threw = false;
+        try {
+            lld.getRecursive(3);
+        } catch (StackOverflowError | IndexOutOfBoundsException e) {
+            // either may occur if implementation is incorrect; treat as a thrown error
+            threw = true;
+        }
+        assertThat(threw).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("randomized operations: maintain invariants and compare to java.util.ArrayList")
+    public void randomizedStressTest() {
+        Deque61B<Integer> lld = new LinkedListDeque61B<>();
+        java.util.ArrayList<Integer> gold = new java.util.ArrayList<>();
+        java.util.Random rand = new java.util.Random(42);
+
+        for (int op = 0; op < 1000; op++) {
+            int action = rand.nextInt(6);
+            if (action == 0) { // addFirst
+                int v = rand.nextInt(1000);
+                lld.addFirst(v);
+                gold.add(0, v);
+            } else if (action == 1) { // addLast
+                int v = rand.nextInt(1000);
+                lld.addLast(v);
+                gold.add(v);
+            } else if (action == 2) { // removeFirst
+                Integer a = lld.removeFirst();
+                Integer b = gold.isEmpty() ? null : gold.remove(0);
+                assertThat(a).isEqualTo(b);
+            } else if (action == 3) { // removeLast
+                Integer a = lld.removeLast();
+                Integer b = gold.isEmpty() ? null : gold.remove(gold.size() - 1);
+                assertThat(a).isEqualTo(b);
+            } else if (action == 4) { // get vs gold
+                if (!gold.isEmpty()) {
+                    int idx = rand.nextInt(gold.size());
+                    assertThat(lld.get(idx)).isEqualTo(gold.get(idx));
+                    assertThat(lld.getRecursive(idx)).isEqualTo(gold.get(idx));
+                }
+            } else { // check size and toList
+                assertThat(lld.size()).isEqualTo(gold.size());
+                assertThat(lld.toList()).containsExactlyElementsIn(gold).inOrder();
+            }
+            // quick invariant: size should never be negative
+            assertThat(lld.size()).isGreaterThan(-1);
+        }
+    }
 }

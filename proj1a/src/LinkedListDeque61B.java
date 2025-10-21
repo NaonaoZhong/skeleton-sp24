@@ -72,20 +72,30 @@ public class LinkedListDeque61B<T> implements Deque61B<T>{
 
     @Override
     public T removeFirst() {
+        if (size > 0){
         T firstItem = sentinel.next.item;
         sentinel.next = sentinel.next.next;
         sentinel.next.prev = sentinel;
         size--;
         return firstItem;
+        }
+        else{
+            return null;
+        }
     }
 
     @Override
     public T removeLast() {
+        if (size > 0){
         T lastItem = sentinel.prev.item;
         sentinel.prev = sentinel.prev.prev;
         sentinel.prev.next = sentinel;
         size--;
         return lastItem;
+        }
+        else{
+            return null;
+        }
 
     }
 
@@ -103,6 +113,10 @@ public class LinkedListDeque61B<T> implements Deque61B<T>{
 
     @Override
     public T getRecursive(int index) {
+
+        if (index < 0 || index > size - 1){
+            throw new IndexOutOfBoundsException();
+        }
         return getRecursiveHelper(index).item;
     }
 
