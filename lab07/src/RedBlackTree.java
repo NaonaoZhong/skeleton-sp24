@@ -50,7 +50,9 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @param node
      */
     void flipColors(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
+        node.isBlack = !node.isBlack;
+        node.left.isBlack = !node.left.isBlack;
+        node.right.isBlack = !node.right.isBlack;
     }
 
     /**
@@ -61,8 +63,14 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     RBTreeNode<T> rotateRight(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+        RBTreeNode<T> n = node;
+        RBTreeNode<T> y = node.left.right;
+        node = node.left;
+        node.right = n;
+        node.right.left = y;
+        node.isBlack =  !node.isBlack;
+        node.right.isBlack = !node.right.isBlack;
+        return node;
     }
 
     /**
@@ -73,8 +81,15 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     RBTreeNode<T> rotateLeft(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+        Boolean color = node.isBlack;
+        RBTreeNode<T> n =node;
+        RBTreeNode<T> y = node.right.left;
+        node = node.right;
+        node.left = n;
+        node.left.right = y;
+        node.isBlack = color;
+        node.left.isBlack = false;
+        return node;
     }
 
     /**
@@ -96,6 +111,28 @@ public class RedBlackTree<T extends Comparable<T>> {
         root.isBlack = true;
     }
 
+    /**Here is the operation check which returns true if the node does not need operation */
+    private Boolean check(RBTreeNode<T> node){
+        // Rotate left operation check
+        if(isRed(node.right) && !isRed(node.left) && !isRed(node)){
+            return false;
+        }
+        if(node.left != null && isRed(node.left) && isRed(node.left.right)){
+            return false;
+        }
+        // Rotate right operation check
+        if(node.left != null && isRed(node.left) && isRed(node.left.left)){
+            return false;
+        }
+
+        // Color flip check
+        if(isRed(node.left) && isRed(node.right)){
+            return false;
+        }
+        return true;
+    }
+
+
     /**
      * Inserts the given node into this Red Black Tree. Comments have been provided to help break
      * down the problem. For each case, consider the scenario needed to perform those operations.
@@ -105,17 +142,44 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @return
      */
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
-        // TODO: Insert (return) new red leaf node.
+        // Insert (return) new red leaf node.
+        if(node == null){
+            node = new RBTreeNode<T>(false, item);
+            return node;
+        }
+        // Handle normal binary search tree insertion.
+        else if(item.equals(node.item)){
+            return node;
+        }
+        else if(item.compareTo(node.item) < 0){
+            node.left = insert(node.left, item);
+        }
+        else if(item.compareTo(node.item) > 0){
+            node.right = insert(node.right, item);
+        }
 
-        // TODO: Handle normal binary search tree insertion.
+        while(!check(node)){
+        // Rotate left operation
 
-        // TODO: Rotate left operation
-
-        // TODO: Rotate right operation
-
-        // TODO: Color flip
-
-        return null; //fix this return statement
+        if(isRed(node.right) && !isRed(node.left) && !isRed(node)){
+            node = rotateLeft(node);
+        }
+        if(node.left != null && isRed(node.left) && isRed(node.left.right)){
+            node.left = rotateLeft(node.left);
+            node = rotateRight(node);
+            flipColors(node);
+        }
+        // Rotate right operation
+        if(node.left != null && isRed(node.left) && isRed(node.left.left)){
+            node = rotateRight(node);
+            flipColors(node);
+        }
+        // Color flip
+        if(isRed(node.left) && isRed(node.right)){
+            flipColors(node);
+        }
+        }
+        return node; //fix this return statement
     }
 
 }
