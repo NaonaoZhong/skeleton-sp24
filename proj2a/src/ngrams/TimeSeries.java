@@ -1,7 +1,11 @@
 package ngrams;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 /**
  * An object for mapping a year number (e.g. 1996) to numerical data. Provides
@@ -30,15 +34,19 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      */
     public TimeSeries(TimeSeries ts, int startYear, int endYear) {
         super();
-        // TODO: Fill in this constructor.
+        // modify keySet() can modify the whole ts at the same time
+        for(Integer key : ts.keySet()){
+            if(key >= startYear && key <= endYear){
+                this.put(key, ts.get(key));
+            }
+        }
     }
 
     /**
      * Returns all years for this TimeSeries (in any order).
      */
     public List<Integer> years() {
-        // TODO: Fill in this method.
-        return null;
+        return new ArrayList<Integer>(keySet());
     }
 
     /**
@@ -46,8 +54,12 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      * Must be in the same order as years().
      */
     public List<Double> data() {
-        // TODO: Fill in this method.
-        return null;
+        List<Double> v = new ArrayList<>(); 
+        Iterator<Integer> years = keySet().iterator();
+        while(years.hasNext()){
+            v.add(get(years.next()));
+        }
+        return v;
     }
 
     /**
@@ -60,8 +72,28 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      * should store the value from the TimeSeries that contains that year.
      */
     public TimeSeries plus(TimeSeries ts) {
-        // TODO: Fill in this method.
-        return null;
+
+        TimeSeries mixTs = new TimeSeries();
+        Set<Integer> onlythis = new TreeSet<Integer>();
+        onlythis.addAll(keySet());
+        onlythis.removeAll(ts.keySet());
+        Set<Integer> onlyts = new TreeSet<Integer>();
+        onlyts.addAll(ts.keySet());
+        onlyts.removeAll(keySet());
+        Set<Integer> both = new TreeSet<Integer>();
+        both.addAll(keySet());
+        both.retainAll(ts.keySet());
+
+        for(Integer key : onlythis){
+            mixTs.put(key, get(key));
+        }
+        for(Integer key : both){
+            mixTs.put(key, get(key) + ts.get(key));
+        }
+        for(Integer key : onlyts){
+            mixTs.put(key, ts.get(key));
+        }
+        return mixTs;
     }
 
     /**
@@ -74,10 +106,20 @@ public class TimeSeries extends TreeMap<Integer, Double> {
      * If TS has a year that is not in this TimeSeries, ignore it.
      */
     public TimeSeries dividedBy(TimeSeries ts) {
-        // TODO: Fill in this method.
-        return null;
-    }
 
-    // TODO: Add any private helper methods.
-    // TODO: Remove all TODO comments before submitting.
+        TimeSeries divTs = new TimeSeries();
+        Set<Integer> onlythis = new TreeSet<Integer>();
+        onlythis.addAll(keySet());
+        onlythis.removeAll(ts.keySet());
+        Set<Integer> both = new TreeSet<Integer>();
+        both.addAll(keySet());
+        both.retainAll(ts.keySet());
+        if(!onlythis.isEmpty()){
+            throw new IllegalArgumentException();
+        }
+        for(Integer key : both){
+            divTs.put(key, get(key)/ts.get(key));
+        }
+        return divTs;
+    }
 }
